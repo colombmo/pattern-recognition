@@ -5,6 +5,7 @@ from sklearn import svm, metrics
 from numpy import genfromtxt
 from skimage.feature import hog
 from sklearn.model_selection import GridSearchCV
+from sklearn import preprocessing
 
 
 print('Start time:' + time.ctime())
@@ -16,23 +17,27 @@ print('Data loaded:' + time.ctime())
 
 trainingLabels = trainingSet[:,0]
 trainingData = trainingSet[:,1:]
+#trainingData_scaled = preprocessing.scale(trainingData)
+min_max_scaler = preprocessing.MinMaxScaler()
+sc_trainingData = min_max_scaler.fit_transform(trainingData)
 
 testLabels = testSet[:,0]
 testData = testSet[:,1:]
+sc_testData = min_max_scaler.transform(testData)
 
-# HoG features for training data
-hogFeaturesList = []
-for feature in trainingData:
-    fd = hog(feature.reshape((28, 28)), orientations=9, pixels_per_cell=(14, 14), cells_per_block=(1, 1), visualise=False)
-    hogFeaturesList.append(fd)
-hogFeatures = np.array(hogFeaturesList, 'float64')
-
-# HoG features for test data
-hog_ft = []
-for feature in testData:
-    ft = hog(feature.reshape((28, 28)), orientations=9, pixels_per_cell=(14, 14), cells_per_block=(1, 1), visualise=False)
-    hog_ft.append(ft)
-hogTestFeatures = np.array(hog_ft, 'float64')
+# # HoG features for training data
+# hogFeaturesList = []
+# for feature in trainingData:
+#     fd = hog(feature.reshape((28, 28)), orientations=9, pixels_per_cell=(14, 14), cells_per_block=(1, 1), visualise=False)
+#     hogFeaturesList.append(fd)
+# hogFeatures = np.array(hogFeaturesList, 'float64')
+#
+# # HoG features for test data
+# hog_ft = []
+# for feature in testData:
+#     ft = hog(feature.reshape((28, 28)), orientations=9, pixels_per_cell=(14, 14), cells_per_block=(1, 1), visualise=False)
+#     hog_ft.append(ft)
+# hogTestFeatures = np.array(hog_ft, 'float64')
 
 
 '''
@@ -43,9 +48,9 @@ Grid search is very time consuming so we will comment it out
 
 svc = svm.SVC(kernel='rbf', cache_size=800, C=5, gamma=0.05)
 
-svc.fit(hogFeatures, trainingLabels)
+svc.fit(sc_trainingData, trainingLabels)
 
-predictedLabels = svc.predict(hogTestFeatures)
+predictedLabels = svc.predict(sc_testData)
 
 
 #params = {'C': [0.01, 0.1, 1, 5], 'gamma': [0.001, 0.01, 0.05, 0.1]}
