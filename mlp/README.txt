@@ -1,3 +1,5 @@
+Results of cross-validation to optimize neurons/layer and learning rate
+
 c ->	0.001	0.004	0.007	0.01
 neurons	
 10	0.2258	0.1669	0.1269	0.1241
@@ -15,3 +17,7 @@ neurons
 250	0.8237	0.8471	0.8137	0.8027
 270	0.8409	0.8529	0.8428	0.7998
 290	0.8378	0.8519	0.8429	0.8150
+
+The best result is obtained with 270 neurons/layer and a learning rate of 0.004.
+
+So we do a test with those values and get an accuracy of 
