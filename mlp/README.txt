@@ -7,3 +7,5 @@ The parameters that gave us the best results during cross validation, and that w
   learning rate=0.3,
   neurons = 100,
   alpha=0.01
+
+With those parameters we get an accuracy >97% on the test set
