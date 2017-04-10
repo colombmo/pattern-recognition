@@ -15,20 +15,19 @@ testSet = genfromtxt('test.csv', delimiter=",")
 
 print('Data loaded:' + time.ctime())
 
-# Suffle data
+# Shuffle data
 trainingSet = utils.shuffle(trainingSet)
 testSet = utils.shuffle(testSet)
 
 trainingLabels = trainingSet[:,0]
 trainingData = trainingSet[:,1:]
 
-#trainingData_scaled = preprocessing.scale(trainingData)
-min_max_scaler = preprocessing.MinMaxScaler()
-sc_trainingData = min_max_scaler.fit_transform(trainingData)
-
 testLabels = testSet[:,0]
 testData = testSet[:,1:]
 
+#Scaling data in interval [0,1]
+min_max_scaler = preprocessing.MinMaxScaler()
+sc_trainingData = min_max_scaler.fit_transform(trainingData)
 sc_testData = min_max_scaler.transform(testData)
 
 
@@ -41,6 +40,8 @@ for index, (image, label) in enumerate(dataAndLabels[:6]):
     plt.imshow(trainingSet[index,1:col].reshape((28,28)), cmap=plt.cm.Greys_r, interpolation='nearest')
     plt.title('Training: %i' % label, fontsize=6)
 
+# For a faster performance we can use HoG features but we will
+# and get a solid accuracy but around 5 percent lower than with the raw features
 
 # # HoG features for training data
 # hogFeaturesList = []

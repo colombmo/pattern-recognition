@@ -11,7 +11,7 @@ testSet = np.genfromtxt('test.csv', delimiter=",")
 
 print('Data loaded:' + time.ctime())
 
-# Suffle data
+# Shuffle data
 trainingSet = utils.shuffle(trainingSet)
 testSet = utils.shuffle(testSet)
 
@@ -31,24 +31,21 @@ for index, (image, label) in enumerate(dataAndLabels[:6]):
     plt.imshow(trainingSet[index,1:col].reshape((28,28)), cmap=plt.cm.Greys_r, interpolation='nearest')
     plt.title('Training: %i' % label, fontsize=6)
 
-print('Enter SVM...')
+#classifier = svm.LinearSVC()
+classifier = svm.LinearSVC(C=0.00001)
 
-classifier = svm.LinearSVC()
-# classifier = svm.LinearSVC(C=0.0001)
-
-	
 # Grid search
-params = {'C': [0.0001, 0.001, 0.1, 1]}
-gridSearch = GridSearchCV(classifier, params)
-gridSearch.fit(trainingData,trainingLabels)
-predictedLabels = gridSearch.predict(testData)
+# params = {'C': [0.00001, 0.0001, 0.001, 1]}
+# gridSearch = GridSearchCV(classifier, params)
+# gridSearch.fit(trainingData,trainingLabels)
+# predictedLabels = gridSearch.predict(testData)
 
-# classifier.fit(trainingData, trainingLabels)
-# predictedLabels = classifier.predict(testData)
+classifier.fit(trainingData, trainingLabels)
+predictedLabels = classifier.predict(testData)
 
 print('The end:' + time.ctime())
 
-print ("C = ", gridSearch.best_estimator_.C)
+# print ("C = ", gridSearch.best_estimator_.C)
 
 print("Classification report %s:n%sn"
       % (classifier, metrics.classification_report(testLabels, predictedLabels)))
