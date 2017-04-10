@@ -6,8 +6,8 @@ import time
 
 print('Start time:' + time.ctime())
 
-trainingSet = np.genfromtxt('train.csv', delimiter=",")
-testSet = np.genfromtxt('test.csv', delimiter=",")
+trainingSet = np.genfromtxt('../mlp/train.csv', delimiter=",")
+testSet = np.genfromtxt('../mlp/test.csv', delimiter=",")
 
 print('Data loaded:' + time.ctime())
 
