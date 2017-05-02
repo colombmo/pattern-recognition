@@ -5,7 +5,7 @@ import os
 from xml.dom import minidom
 
 # Split data in training and validation data
-for type in ["train"]:#, "valid"]:
+for type in ["train", "valid"]:
 	# Create new folder for putting single images
 	try:
 		os.mkdir("images/"+type)
