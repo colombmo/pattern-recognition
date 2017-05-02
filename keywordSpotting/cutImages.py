@@ -5,7 +5,7 @@ import os
 from xml.dom import minidom
 
 # Split data in training and validation data
-for type in ["train", "valid"]:
+for type in ["train"]:#, "valid"]:
 	# Create new folder for putting single images
 	try:
 		os.mkdir("images/"+type)
@@ -62,16 +62,16 @@ for type in ["train", "valid"]:
 			
 			# Crop image and mask, to only focus on the area around the wanted text piece
 			img = img[minY:maxY, minX:maxX]
+			# Image binarization, with Otsu's thresholding
+			r, img = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+						
 			mask = cv2.bitwise_not(mask[minY:maxY, minX:maxX])
 			
 			# Mask image
-			masked_image = cv2.bitwise_or(img, mask)
-			
-			# Image binarization, with Otsu's thresholding
-			r, image = cv2.threshold(masked_image,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+			image = cv2.bitwise_or(img, mask)
 			
 			'''
-			## In reality we don't really care about skew, since it is handled well enough by the already done separation of the words
+			## In reality we probably don't really care about skew, since it is handled well enough by the already done separation of the words
 			
 			# Find skew with lower contour pixel regression
 			lower_pixels = {"x":[], "y":[]}
