@@ -2,9 +2,9 @@
 
 From this directory, execute:
 
-	- #### python cutImages.py #### To extract the single word images from the full pages, normalize and binarize them.
-	- #### python extractFeatures.py #### To extract some features from the images, and normalize them. This is saved in some text file, in such a way that during recognition the images don't have to be analysed again.
-	- #### python recognition.py #### To iterate through all keywords defined in #### keywords.txt #### and find them inside the test images. Here the average mean precision is also computed and returned as output.
+- #### python cutImages.py #### To extract the single word images from the full pages, normalize and binarize them.
+- #### python extractFeatures.py #### To extract some features from the images, and normalize them. This is saved in some text file, in such a way that during recognition the images don't have to be analysed again.
+- #### python recognition.py #### To iterate through all keywords defined in #### keywords.txt #### and find them inside the test images. Here the average mean precision is also computed and returned as output.
 
 
 
