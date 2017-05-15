@@ -42,6 +42,11 @@ for type in ["train", "valid"]:
 		# Read id of words from svg file
 		ids = [path.getAttribute("id") for path in minidom.parseString(data).getElementsByTagName("path")]
 		
+		
+		# Image binarization, with Otsu's thresholding
+		#r, originalImg = cv2.threshold(originalImg,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+		originalImg = cv2.adaptiveThreshold(originalImg,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,99,30)
+		
 		for i,p in enumerate(points):
 			img = originalImg
 			
@@ -62,6 +67,7 @@ for type in ["train", "valid"]:
 			
 			# Crop image and mask, to only focus on the area around the wanted text piece
 			img = img[minY:maxY, minX:maxX]
+			
 			# Image binarization, with Otsu's thresholding
 			r, img = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 						
@@ -70,6 +76,18 @@ for type in ["train", "valid"]:
 			# Mask image
 			image = cv2.bitwise_or(img, mask)
 			
+			# Cut white borders from image
+			im2, contours, hierarchy = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+			
+			xm = []; ym = []; xM = []; yM = []
+			contours = contours[1:]
+			for cnt in contours:
+				x,y,w,h = cv2.boundingRect(cnt)
+				xm.append(x); ym.append(y); xM.append(x+w); yM.append(y+h)
+			try:
+				image = image[min(ym)+1:max(yM)-1, min(xm)+1:max(xM)-1]
+			except:
+				pass
 			'''
 			## In reality we probably don't really care about skew, since it is handled well enough by the already done separation of the words
 			
