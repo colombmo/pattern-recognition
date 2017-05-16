@@ -54,15 +54,20 @@ for key in keywords:
 		for label in features["valid"]:
 			dists = []
 			for trainFeat in tempFeatures:
-				dist, path = fastdtw(features["valid"][label], trainFeat, dist=euclidean)
-				dists.append(dist)
-			res[label] = np.mean(dists)
-		
+				if abs(features["valid"][label][0][3]-trainFeat[0][3]) < 1.5:
+					ts = [np.delete(f,[]) for f in features["valid"][label]]
+					tr = [np.delete(f,[]) for f in trainFeat]
+					dist, path = fastdtw(ts,tr, dist=euclidean)#features["valid"][label], trainFeat, dist=euclidean)
+					dists.append(dist)
+			
+			if len(dists)>0:
+				res[label] = np.mean(dists)
+				
 		# Sort elements by increasing distance
 		results = sorted(res, key=res.get, reverse = False)
 		
-		#pr = [transcriptions[r] for r in results[:10]]
-		#print(pr)
+		pr = [transcriptions[r] for r in results[:10]]
+		print(pr)
 		
 		# Compute average precision
 		precisions = []
@@ -77,13 +82,14 @@ for key in keywords:
 			else:
 				fp=fp+1
 			precisions.append(tp/(tp+fp))
+		
+		if len(precisions)>0:
+			if np.mean(precisions)>0:
+				mean_precisions.append(np.mean(precisions))
 
-		if np.mean(precisions)>0:
-			mean_precisions.append(np.mean(precisions))
-
-		#print("Key: "+key+", avg_precision: "+str(np.mean(precisions)))
+			print("Key: "+key+", avg_precision: "+str(np.mean(precisions)))
 
 #print(mean_precisions)
-print("Using max of distances")
+print("ratio")
 print("Average mean precision: "+str(np.mean(mean_precisions)))
 print("End: "+str(datetime.datetime.now().time()))
