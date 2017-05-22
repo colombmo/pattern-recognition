@@ -18,6 +18,7 @@ with open("users.txt", "r") as myfile:
 
 for fn in lines:
     filenum = fn.replace("\n", "")
+    enrollment[filenum]={}
     for i in range(1, 6):
         with open("enrollment/" + filenum + "-g-0" + str(i) + ".txt", "r") as myfile:
             lines = myfile.readlines()
@@ -47,7 +48,7 @@ for fn in lines:
                 feats.extend((x, y, vx, vy, pressure))
                 features[line] = feats
                 line = line + 1
-        enrollment[filenum + "-" + str(i)] = features
+        enrollment[filenum][i] = features
 
 verification = {}
 
@@ -92,46 +93,60 @@ with open("gt.txt", "r") as myfile:
 
 print("Start: " + str(datetime.datetime.now().time()))
 
+# #compute the mean distance between variations of genuine signatures for each rider
+mean_dist = {}
+for author in enrollment:
+    mean_dist[author] = {}
+    dists = []
+    for var_i in enrollment[author]:
+        for var_j in enrollment[author]:
+            if int(var_i)<int(var_j):
+                dist, path = fastdtw(enrollment[author][var_i], enrollment[author][var_j], dist=euclidean)
+                dists.append(dist)
+    mean_dist[author] = np.mean(dists)
 
-mean_precisions = []
 res = {}
+predictions={}
 
 #compute dissimilarity for each verification signature wrt the 5 genuine ones
 for signature in verification:
+    predictions[signature]={}
     dists = []
-    for genuine in enrollment:
-        dist, path = fastdtw(verification[signature], enrollment[genuine], dist=euclidean)
+    tempAuthor = signature.split("-")[0]
+    for genuine in enrollment[tempAuthor]:
+        dist, path = fastdtw(verification[signature], enrollment[tempAuthor][genuine], dist=euclidean)
         dists.append(dist)
 
     if len(dists) > 0:
         res[signature] = np.mean(dists)
 
-# Sort elements by increasing distance
-results = sorted(res, key=res.get, reverse=False)
+    if abs(res[signature] - mean_dist[tempAuthor]) < 10000:
+        predictions[signature] = 'g'
+    else:
+        predictions[signature] = 'f'
+
 
 print("End of dtw: " + str(datetime.datetime.now().time()))
 
-pr = [transcriptions[r] for r in results[:10]]
-print(pr)
+# Compute average precision
+mean_precisions = []
+precisions = []
+tp = 0
+fp = 0
 
-# # Compute average precision
-# precisions = []
-# tp = 0
-# fp = 0
-#
-# for r in results:
-#     if transcriptions[r] == transcriptions[signature]:
-#         tp = tp + 1
-#     else:
-#         fp = fp + 1
-#     precisions.append(tp / (tp + fp))
-#
-# if len(precisions) > 0:
-#     if np.mean(precisions) > 0:
-#         mean_precisions.append(np.mean(precisions))
-#
-#     print("avg_precision: " + str(np.mean(precisions)))
-#
-# print("ratio")
-# print("Average mean precision: " + str(np.mean(mean_precisions)))
-# print("End: " + str(datetime.datetime.now().time()))
+for r in predictions:
+    if transcriptions[r] == predictions[r]:
+        tp = tp + 1
+    else:
+        fp = fp + 1
+    precisions.append(tp / (tp + fp))
+
+if len(precisions) > 0:
+    if np.mean(precisions) > 0:
+        mean_precisions.append(np.mean(precisions))
+
+    print("avg_precision: " + str(np.mean(precisions)))
+
+print("ratio")
+print("Average mean precision: " + str(np.mean(mean_precisions)))
+print("End: " + str(datetime.datetime.now().time()))
