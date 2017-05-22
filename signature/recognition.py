@@ -1,13 +1,10 @@
 import numpy as np
 from scipy.spatial.distance import euclidean
-
-# from dtw import dtw
 from fastdtw import fastdtw
 import datetime
 import os
 
 # Read feature vectors from .txt
-# Fill dictionary of couples id - feature vectors
 features = {}
 enrollment = {}
 previous = {}
@@ -16,11 +13,12 @@ previous = {}
 with open("users.txt", "r") as myfile:
     lines = myfile.readlines()
 
+#Loading enrollment data(genuine signatures)
 for fn in lines:
     filenum = fn.replace("\n", "")
     enrollment[filenum]={}
     for i in range(1, 6):
-        with open("enrollment/" + filenum + "-g-0" + str(i) + ".txt", "r") as myfile:
+        with open("enrollment/" + filenum + "-g-%02d.txt" % (i,), "r") as myfile:
             lines = myfile.readlines()
             line = 0
             features = np.zeros((lines.__len__(), 5), dtype=np.float)
@@ -50,8 +48,8 @@ for fn in lines:
                 line = line + 1
         enrollment[filenum][i] = features
 
+#Loading verification data
 verification = {}
-
 for filename in os.listdir("verification/"):
     with open("verification/" + filename, "r") as myfile:
         lines = myfile.readlines()
@@ -93,7 +91,7 @@ with open("gt.txt", "r") as myfile:
 
 print("Start: " + str(datetime.datetime.now().time()))
 
-# #compute the mean distance between variations of genuine signatures for each rider
+#compute the mean distance between variations of genuine signatures for each rider
 mean_dist = {}
 for author in enrollment:
     mean_dist[author] = {}
@@ -107,6 +105,7 @@ for author in enrollment:
 
 res = {}
 predictions={}
+threshold = 10000
 
 #compute dissimilarity for each verification signature wrt the 5 genuine ones
 for signature in verification:
@@ -120,13 +119,10 @@ for signature in verification:
     if len(dists) > 0:
         res[signature] = np.mean(dists)
 
-    if abs(res[signature] - mean_dist[tempAuthor]) < 10000:
+    if abs(res[signature] - mean_dist[tempAuthor]) < threshold:
         predictions[signature] = 'g'
     else:
         predictions[signature] = 'f'
-
-
-print("End of dtw: " + str(datetime.datetime.now().time()))
 
 # Compute average precision
 mean_precisions = []
