@@ -9,3 +9,8 @@ __pycache__/
 keywordSpotting/images/test/
 
 keywordSpotting/images/train/
+/signature/__init__.py
+.idea/
+kws/
+pattern-recognition-moreno/
+signature1.zip
