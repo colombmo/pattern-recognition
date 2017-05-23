@@ -5,16 +5,11 @@ import cv2
 '''
 	Process the data, by creating feature vectors from the images.
 	1. Scale images
-	2. Generate feature vectors for each images:
-		- width/height ratio
+	2. Generate feature vectors for each images (only 4 features left after features selection):
 		- Upper contour
 		- Lower contour
 		- #b/w transitions
-		[- fraction of black px in the window
-		- fraction of black px between LC and UC
-		- Gradient: difference LCi to LCi-1
-		- Gradient: difference UCi to UCi-1
-		]
+		- width/height ratio
 	3. Normalize vectors
 '''
 
@@ -30,14 +25,13 @@ with open("ground-truth/transcription.txt", "r") as myfile:
 		a = l.replace("\n","").split(' ')
 		values[a[0]] = a[1]
 
-for type in ["train", "valid"]:
+for type in ["train", "test"]:
 	data[type] = {}
 	
 	for filename in os.listdir("images/"+type):
 		# Open image
 		img = cv2.imread("images/"+type+"/"+filename, 0)
 		# Get original width/height ratio and store it
-		#ratios[type][filename.replace(".jpg","")] = img.shape[1]/img.shape[0]
 		ratio = img.shape[1]/img.shape[0]
 		# Scale image
 		img = cv2.resize(img,(width, height), interpolation = cv2.INTER_CUBIC)         
@@ -58,25 +52,9 @@ for type in ["train", "valid"]:
 				if img[j,i]!=img[j-1,i]:
 					trans = trans+1
 			features[i][2] = trans
-			
+			# Width/height ratio
 			features[i][3] = ratio
 			
-			'''
-			features[i][3] = (img.shape[0]-np.count_nonzero(col))/height					# Fraction of black pixels in the overall window
-			if int(features[i][1]-features[i][0]) != 0:
-				features[i][4] = ((features[i][1]-features[i][0])-np.count_nonzero(col[int(features[i][0]):int(features[i][1])]))/int(features[i][1]-features[i][0])
-																							# Fraction of black pixels between LC and UC
-			else:
-				features[i][4] = 0
-			
-			# Gradient
-			if i== 0:
-				features[i][5] = features[i][0] 
-				features[i][6] = features[i][1]
-			else:
-				features[i][5] = features[i][0]-features[i-1][0]
-				features[i][6] = features[i][1]-features[i-1][1]
-			'''	
 		data[type][filename.replace(".jpg","")] = features;
 
 # Normalize using training data

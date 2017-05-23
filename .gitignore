@@ -2,3 +2,7 @@
 keywordSpotting/images/train/
 
 keywordSpotting/images/valid/
+
+keywordSpotting/ground-truth/locations/
+
+keywordSpotting/images/

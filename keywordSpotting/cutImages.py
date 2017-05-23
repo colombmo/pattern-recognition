@@ -5,7 +5,7 @@ import os
 from xml.dom import minidom
 
 # Split data in training and validation data
-for type in ["train", "valid"]:
+for type in ["train", "test"]:
 	# Create new folder for putting single images
 	try:
 		os.mkdir("images/"+type)
@@ -43,8 +43,7 @@ for type in ["train", "valid"]:
 		ids = [path.getAttribute("id") for path in minidom.parseString(data).getElementsByTagName("path")]
 		
 		
-		# Image binarization, with Otsu's thresholding
-		#r, originalImg = cv2.threshold(originalImg,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+		# Image binarization, with Gaussian thresholding
 		originalImg = cv2.adaptiveThreshold(originalImg,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,99,30)
 		
 		for i,p in enumerate(points):
@@ -69,7 +68,7 @@ for type in ["train", "valid"]:
 			img = img[minY:maxY, minX:maxX]
 			
 			# Image binarization, with Otsu's thresholding
-			r, img = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+			#r, img = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 						
 			mask = cv2.bitwise_not(mask[minY:maxY, minX:maxX])
 			
@@ -88,29 +87,6 @@ for type in ["train", "valid"]:
 				image = image[min(ym)+1:max(yM)-1, min(xm)+1:max(xM)-1]
 			except:
 				pass
-			'''
-			## In reality we probably don't really care about skew, since it is handled well enough by the already done separation of the words
 			
-			# Find skew with lower contour pixel regression
-			lower_pixels = {"x":[], "y":[]}
-			for x in range(0,image.shape[1]):
-				try:
-					lower_pixels["y"].append(np.amax(np.where(image[:,x] < 255)))
-					lower_pixels["x"].append(x)
-				except:
-					continue
-
-			# Slope of linear regression on the lower contour points
-			m, b = np.polyfit(lower_pixels["x"], lower_pixels["y"], 1)
-			# Skew
-			angle = -np.arctan(m);
-			print(angle)
-			# rotate the image to deskew it
-			(h, w) = image.shape[:2]
-			center = (w // 2, h // 2)
-			M = cv2.getRotationMatrix2D(center, math.degrees(angle), 1.0)
-			rotated = cv2.warpAffine(image, M, (w, h),
-				flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
-			'''
 			# Save preprocessed image
 			cv2.imwrite("images/"+type+"/"+ids[i]+".jpg",image)
