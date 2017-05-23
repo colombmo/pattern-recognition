@@ -13,7 +13,7 @@ previous = {}
 with open("users.txt", "r") as myfile:
     lines = myfile.readlines()
 
-#Loading enrollment data(genuine signatures)
+# Loading enrollment data(genuine signatures)
 for fn in lines:
     filenum = fn.replace("\n", "")
     enrollment[filenum]={}
@@ -48,7 +48,7 @@ for fn in lines:
                 line = line + 1
         enrollment[filenum][i] = features
 
-#Loading verification data
+# Loading verification data
 verification = {}
 for filename in os.listdir("verification/"):
     with open("verification/" + filename, "r") as myfile:
@@ -81,17 +81,9 @@ for filename in os.listdir("verification/"):
             linev = linev + 1
     verification[filename.replace(".txt", "")] = features
 
-#Load transcriptions
-transcriptions = {}
-with open("gt.txt", "r") as myfile:
-    lines = myfile.readlines()
-    for l in lines:
-        a = l.replace("\n", "").split(" ")
-        transcriptions[a[0]] = a[1]
-
 print("Start: " + str(datetime.datetime.now().time()))
 
-#compute the mean distance between variations of genuine signatures for each rider
+# Compute the mean distance between variations of genuine signatures for each rider
 mean_dist = {}
 for author in enrollment:
     mean_dist[author] = {}
@@ -105,9 +97,9 @@ for author in enrollment:
 
 res = {}
 predictions={}
-threshold = 10000
+threshold = 12000
 
-#compute dissimilarity for each verification signature wrt the 5 genuine ones
+# compute dissimilarity for each verification signature wrt the 5 genuine ones
 for signature in verification:
     predictions[signature]={}
     dists = []
@@ -124,25 +116,38 @@ for signature in verification:
     else:
         predictions[signature] = 'f'
 
-# Compute average precision
-mean_precisions = []
-precisions = []
-tp = 0
-fp = 0
 
-for r in predictions:
-    if transcriptions[r] == predictions[r]:
-        tp = tp + 1
-    else:
-        fp = fp + 1
-    precisions.append(tp / (tp + fp))
+with open("Predictions.txt", "w") as text_file:
+    for r in predictions:
+        text_file.write("%s %s\n" % (r , predictions[r]))
 
-if len(precisions) > 0:
-    if np.mean(precisions) > 0:
-        mean_precisions.append(np.mean(precisions))
+# Load transcriptions
+transcriptions = {}
+with open("gt.txt", "r") as myfile:
+    lines = myfile.readlines()
+    for l in lines:
+        a = l.replace("\n", "").split(" ")
+        transcriptions[a[0]] = a[1]
 
-    print("avg_precision: " + str(np.mean(precisions)))
-
-print("ratio")
-print("Average mean precision: " + str(np.mean(mean_precisions)))
-print("End: " + str(datetime.datetime.now().time()))
+# # Compute average precision
+# mean_precisions = []
+# precisions = []
+# tp = 0
+# fp = 0
+#
+# for r in predictions:
+#     if transcriptions[r] == predictions[r]:
+#         tp = tp + 1
+#     else:
+#         fp = fp + 1
+#     precisions.append(tp / (tp + fp))
+#
+# if len(precisions) > 0:
+#     if np.mean(precisions) > 0:
+#         mean_precisions.append(np.mean(precisions))
+#
+#     print("avg_precision: " + str(np.mean(precisions)))
+#
+# print("ratio")
+# print("Average mean precision: " + str(np.mean(mean_precisions)))
+# print("End: " + str(datetime.datetime.now().time()))
