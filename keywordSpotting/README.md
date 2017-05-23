@@ -1,12 +1,23 @@
 # How to run
 
-From this directory, execute:
+From keywordSpotting directory, execute:
 
 - python cutImages.py : To extract the single word images from the full pages, normalize and binarize them.
 - python extractFeatures.py: To extract some features from the images, and normalize them. This is saved in some text file, in such a way that during recognition the images don't have to be analysed again.
-- python recognition.py: To iterate through all keywords defined in #### keywords.txt #### and find them inside the test images. Here the average mean precision is also computed and returned as output.
+- python recognition.py: To iterate through all keywords defined in #### keywords.txt #### and find them inside the test images. 
+- The results of the recognition will be stored in the file #### results.txt ####
 
+# Parameters and features selection
 
+During validation, we tried several combinations of parameters and features, and we found out that we were getting the best results with the following features:
+- Upper contour
+- Lower contour
+- Number of black-white transitions
+- Original ratio width/height of each word
+
+We used DTW with a window width of 1px, on images of the words after having been scaled to 50px x 100px.
+
+With those parameters and features, we managed to get 54.5% mean average precision on the validation set.
 
 # Description of data
 
