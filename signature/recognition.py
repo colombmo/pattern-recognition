@@ -97,7 +97,7 @@ for author in enrollment:
 
 res = {}
 predictions={}
-threshold = 12000
+threshold = 10000
 
 # compute dissimilarity for each verification signature wrt the 5 genuine ones
 for signature in verification:
