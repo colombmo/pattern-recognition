@@ -5,3 +5,7 @@ __pycache__/
 *$py.class
 *.xml
 *.iml
+
+keywordSpotting/images/test/
+
+keywordSpotting/images/train/
